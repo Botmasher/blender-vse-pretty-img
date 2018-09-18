@@ -23,7 +23,7 @@ def register():
     register_class(ui.PrettyImageHandler)
 
 def unregister():
-    register_class(ui.PrettyImageHandler)
+    unregister_class(ui.PrettyImageHandler)
     unregister_class(ui.PrettyImageOperator)
     bpy.types.SEQUENCER_MT_add.remove(ui.menu_add)
 

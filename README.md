@@ -1,6 +1,6 @@
 # Pretty Image Loader
 
-Image loading tool for the Blender video editor (sequencer). This Blender addon loads prettier images with transparency and original image dimensions instead of default settings and wonkily stretched/squashed dimensions.
+Strip loading tool for the Blender video editor (sequencer). This Blender addon loads prettier images and movies with transparency and original image dimensions instead of default settings and wonkily stretched/squashed dimensions.
 
 ## Getting Started
 
