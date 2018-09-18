@@ -23,12 +23,12 @@ class PrettyImagePanel (bpy.types.Panel):
         #if sequencer.active_strip: return
 
         row = self.layout.row()
-        row.operator("strip.add_pretty", text="Add Pretty Image")
+        row.operator("sequencer.pretty_strip_add", text="Add Pretty Image")
 
 class PrettyImageOperator (bpy.types.Operator):
     # Blender UI label, id and description
     bl_label = "Pretty Image Operator"
-    bl_idname = 'strip.add_pretty'
+    bl_idname = 'sequencer.pretty_strip_add'
     bl_description = "Add a new image with alpha, transform strip and proper dimensions."
     # import settings
     filepath = StringProperty (name='File Path')
@@ -48,7 +48,7 @@ class PrettyImageOperator (bpy.types.Operator):
         return img_filenames
 
     def execute (self, ctx):
-        print("\n\nRestarting PRETTY IMG LOADER...")
+        print("\nRunning operator for PRETTY IMG LOADER")
         bpy.context.scene.sequence_editor_create()  # verify vse is valid in scene
         img_filenames = self.store_files(self.files)
         img_path = self.directory
@@ -56,12 +56,20 @@ class PrettyImageOperator (bpy.types.Operator):
             load_scale_img(filename, "{0}{1}".format(img_path, filename), scale=self.img_scale, length=self.length, alpha=self.set_alpha)
         return {'FINISHED'}
 
-    # TODO file manager does not show after first img loaded - op keeps placing prev img
+    # TODO file manager does not show in pop-up menu - op keeps placing prev img
 
     def invoke (self, context, event):
+        print("\nRunning invoke - see file browser")
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
+class PrettyImageHandler (bpy.types.Operator):
+    bl_label = "Pretty Image Handler"
+    bl_idname = 'sequencer.pretty_strip_handler'
+    def execute (self, ctx):
+        bpy.ops.sequencer.pretty_strip_add('INVOKE_DEFAULT')
+        return {'FINISHED'}
+
 def menu_add(self, ctx):
     layout = self.layout
-    layout.operator(PrettyImageOperator.bl_idname, text="Pretty Image")
+    layout.operator('sequencer.pretty_strip_handler', text="Pretty Strip")

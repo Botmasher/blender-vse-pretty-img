@@ -17,24 +17,14 @@ bl_info = {
     "category": "VSE"
 }
 
-# def register_modules(modules, unregister=False):
-#     for module in modules:
-#         for member in inspect.getmembers(module, inspect.isclass):
-#             memberClass = member[1]
-#             try:
-#                 registration = unregister_class(memberClass) if unregister else register_class(memberClass)
-#             except RuntimeError:
-#                 print("Failed to load module member class {0}. Skipping for now.".format(memberClass))
-#     return
-
 def register():
     bpy.types.SEQUENCER_MT_add.append(ui.menu_add)
-    # register_modules([ui])
     register_class(ui.PrettyImageOperator)
+    register_class(ui.PrettyImageHandler)
 
 def unregister():
-    register_class(ui.PrettyImageOperator)
-    # register_modules(reversed([ui]), unregister=True)
+    unregister_class(ui.PrettyImageHandler)
+    unregister_class(ui.PrettyImageOperator)
     bpy.types.SEQUENCER_MT_add.remove(ui.menu_add)
 
 if __name__ == '__main__':
