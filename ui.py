@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from bpy_extras.io_utils import ImportHelper
-from .pretty_img import load_scale_img
+from .pretty_img import load_pretty_strip
 
 # UI menu properties
 PrettyImageProperties = {
@@ -9,6 +9,11 @@ PrettyImageProperties = {
     'scale': FloatProperty(name="Scale", description="Transform scale to apply to fitted image", default=1.0),
     'length': IntProperty(name="Strip length", description="Frame duration of imported images", default=10)
 }
+
+# TODO get enum values - these fillers from output render.image_settings (bpy.types.ImageFormatSettings)
+# https://docs.blender.org/api/blender_python_api_2_77_1/bpy.types.ImageFormatSettings.html
+image_types = ['BMP', 'IRIS', 'PNG', 'JPEG', 'JPG', 'TARGA']
+movie_types = ['MPEG', 'MP4', 'MOV', 'AVI']
 
 class PrettyImagePanel (bpy.types.Panel):
     # Blender UI label, name, placement
@@ -52,8 +57,16 @@ class PrettyImageOperator (bpy.types.Operator):
         bpy.context.scene.sequence_editor_create()  # verify vse is valid in scene
         img_filenames = self.store_files(self.files)
         img_path = self.directory
+        known_movie_types = []
         for filename in img_filenames:
-            load_scale_img(filename, "{0}{1}".format(img_path, filename), scale=self.img_scale, length=self.length, alpha=self.set_alpha)
+            extension = "{0}".format(filename[filename.rfind(".")+1:])
+            if extension in image_types:
+                strip_type = 'IMAGE'
+            elif extension in movie_types:
+                strip_type = 'MOVIE'
+            else:
+                continue
+            load_scale_img(filename, "{0}{1}".format(img_path, filename), strip_type, scale=self.img_scale, length=self.length, alpha=self.set_alpha)
         return {'FINISHED'}
 
     # TODO file manager does not show in pop-up menu - op keeps placing prev img

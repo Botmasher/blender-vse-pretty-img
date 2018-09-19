@@ -1,14 +1,25 @@
 #!/usr/bin/env python
 import bpy
 
-def load_scale_img (name, path, scale=1.0, channel=1, length=10, alpha=True):
+def load_pretty_strip (name, path, strip_type, scale=1.0, channel=1, length=10, alpha=True):
 
     scene = bpy.context.scene
+
+    strip_creators = {
+        'IMAGE': scene.sequence_editor.sequences.new_image,
+        'MOVIE': scene.sequence_editor.sequences.new_movie,
+        #'CLIP': scene.sequence_editor.sequences.new_clip,
+        #'SOUND': scene.sequence_editor.sequences.new_sound
+    }
+
+    if file_type not in strip_creators.keys():
+        return
 
     scene.sequence_editor_create()
     # create sequence editor
 
-    strip = scene.sequence_editor.sequences.new_image(name=name, filepath=path, channel=channel, frame_start=scene.frame_current)
+    strip = None
+    strip = strip_creators[strip_type](name=name, filepath=path, channel=channel, frame_start=scene.frame_current)
 
     def deselect_strips ():
         bpy.ops.sequencer.select_all(action='DESELECT')
