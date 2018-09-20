@@ -5,14 +5,18 @@ def load_pretty_strip (name, path, strip_type, scale=1.0, channel=1, length=10, 
 
     scene = bpy.context.scene
 
-    strip_creators = {
-        'IMAGE': scene.sequence_editor.sequences.new_image,
-        'MOVIE': scene.sequence_editor.sequences.new_movie,
-        #'CLIP': scene.sequence_editor.sequences.new_clip,
-        #'SOUND': scene.sequence_editor.sequences.new_sound
-    }
+    IMAGE = 'IMAGE'
+    MOVIE = 'MOVIE'
+    #CLIP = 'CLIP'
+    #SOUND = 'SOUND'
 
-    if file_type not in strip_creators.keys():
+    strip_creators = {}
+    strip_creators[IMAGE] = scene.sequence_editor.sequences.new_image
+    strip_creators[MOVIE] = scene.sequence_editor.sequences.new_movie
+    #strip_creators[CLIP] = scene.sequence_editor.sequences.new_clip
+    #strip_creators[SOUND] = scene.sequence_editor.sequences.new_sound
+
+    if strip_type not in strip_creators.keys():
         return
 
     scene.sequence_editor_create()
@@ -90,7 +94,8 @@ def load_pretty_strip (name, path, strip_type, scale=1.0, channel=1, length=10, 
         strip.blend_alpha = 0.0
 
     # set strip length
-    strip.frame_final_duration = length
+    if strip_type != MOVIE:
+        strip.frame_final_duration = length
 
     scene.frame_current = frame_initial
 

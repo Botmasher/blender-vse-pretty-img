@@ -59,14 +59,17 @@ class PrettyImageOperator (bpy.types.Operator):
         img_path = self.directory
         known_movie_types = []
         for filename in img_filenames:
-            extension = "{0}".format(filename[filename.rfind(".")+1:])
+            extension = "{0}".format(filename[filename.rfind(".")+1:]).upper()
             if extension in image_types:
+                print("Loading image strip")
                 strip_type = 'IMAGE'
             elif extension in movie_types:
+                print("Loading movie strip")
                 strip_type = 'MOVIE'
             else:
+                print("Unknown image or movie: {0}".format(filename))
                 continue
-            load_scale_img(filename, "{0}{1}".format(img_path, filename), strip_type, scale=self.img_scale, length=self.length, alpha=self.set_alpha)
+            load_pretty_strip(filename, "{0}{1}".format(img_path, filename), strip_type, scale=self.img_scale, length=self.length, alpha=self.set_alpha)
         return {'FINISHED'}
 
     # TODO file manager does not show in pop-up menu - op keeps placing prev img
