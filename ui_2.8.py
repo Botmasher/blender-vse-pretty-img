@@ -1,14 +1,24 @@
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty, FloatProperty, IntProperty, CollectionProperty, StringProperty
 from bpy_extras.io_utils import ImportHelper
-from .pretty_img import load_scale_img
 
 # UI menu properties
-PrettyImageProperties = {
-    'alpha': BoolProperty(name="Transparency", description="Use alpha blend on image transform", default=True),
-    'scale': FloatProperty(name="Scale", description="Transform scale to apply to fitted image", default=1.0),
-    'length': IntProperty(name="Strip length", description="Frame duration of imported images", default=10)
-}
+class PrettyImageProperties(bpy.types.PropertyGroup):
+    alpha: BoolProperty(
+        name="Transparency",
+        description="Use alpha blend on image transform",
+        default=True
+        )
+    scale: FloatProperty(
+        name="Scale",
+        description="Transform scale to apply to fitted image",
+        default=1.0
+        )
+    length: IntProperty(
+        name="Strip length",
+        description="Frame duration of imported images",
+        default=10
+        )
 
 class PrettyImagePanel (bpy.types.Panel):
     # Blender UI label, name, placement
@@ -17,11 +27,6 @@ class PrettyImagePanel (bpy.types.Panel):
     bl_space_type = 'SEQUENCE_EDITOR'
     bl_region_type = 'UI'
     def draw (self, context):
-
-        # TODO do not show if inspecting a single strip
-        sequencer = bpy.context.scene.sequence_editor
-        #if sequencer.active_strip: return
-
         row = self.layout.row()
         row.operator("strip.pretty_strip_add", text="Add Pretty Image")
 
@@ -37,29 +42,23 @@ class PrettyImageOperator (bpy.types.Operator):
     filter_image = BoolProperty(default=True, options={'HIDDEN'})
     filter_folder = BoolProperty(default=True, options={'HIDDEN'})
     # image loading/formatting
-    set_alpha = PrettyImageProperties['alpha']
-    img_scale = PrettyImageProperties['scale']
-    length = PrettyImageProperties['length']
+    set_alpha = PrettyImageProperties.alpha
+    img_scale = PrettyImageProperties.scale
+    length = PrettyImageProperties.length
 
     def store_files (self, files):
-        img_filenames = []
-        for f in files:
-            img_filenames.append (f.name)
-        return img_filenames
+        return [f.name for f in files]
 
     def execute (self, ctx):
-        print("\nRunning operator for PRETTY IMG LOADER")
-        bpy.context.scene.sequence_editor_create()  # verify vse is valid in scene
+        bpy.context.scene.sequence_editor_create()
         img_filenames = self.store_files(self.files)
         img_path = self.directory
-        for filename in img_filenames:
-            load_scale_img(filename, "{0}{1}".format(img_path, filename), scale=self.img_scale, length=self.length, alpha=self.set_alpha)
+        [print(f) for f in img_filenames]
         return {'FINISHED'}
 
-    # TODO file manager does not show in pop-up menu - op keeps placing prev img
+    # TODO: show file manager when selected in pop-up menu - op keeps placing prev img
 
     def invoke (self, context, event):
-        print("\nRunning invoke - see file browser")
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
@@ -67,9 +66,18 @@ class PrettyImageHandler (bpy.types.Operator):
     bl_label = "Pretty Image Handler"
     bl_idname = 'strip.pretty_strip_handler'
     def execute (self, ctx):
-        bpy.ops.sequencer.pretty_strip_add('INVOKE_DEFAULT')
+        #bpy.ops.sequencer.pretty_strip_add('INVOKE_DEFAULT')
+        print("Running image handler")
         return {'FINISHED'}
 
 def menu_add(self, ctx):
     layout = self.layout
     layout.operator('strip.pretty_strip_handler', text="Pretty Strip")
+
+def register():
+    bpy.utils.register_class(PrettyImageProperties)
+    bpy.utils.register_class(PrettyImagePanel)
+    bpy.utils.register_class(PrettyImageOperator)
+    
+if __name__ == '__main__':
+    register()
